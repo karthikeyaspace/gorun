@@ -1,0 +1,16 @@
+services:
+  # - name: client
+  #   command: npm run dev
+  #   dir: /client
+
+  # - name: server
+  #   command: npm run dev
+  #   dir: /server
+
+  # - name: db
+  #   command: docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:alpine
+  #   dir: /
+
+  - name: client
+    command: start index.html
+    dir: root
