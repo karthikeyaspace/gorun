@@ -1,16 +1,22 @@
-services:
-  # - name: client
-  #   command: npm run dev
-  #   dir: /client
+# gorun.yaml
 
-  # - name: server
-  #   command: npm run dev
-  #   dir: /server
+services:
+  - name: client
+    command: npm run dev
+    dir: /client
+    type: server
+
+  - name: server
+    command: nodemon
+    dir: /server
+    type: server
 
   # - name: db
   #   command: docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:alpine
   #   dir: /
+  #   type: static
 
   - name: client
     command: start index.html
-    dir: root
+    dir: /test
+    type: static

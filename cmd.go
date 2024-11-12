@@ -10,35 +10,44 @@ import (
 
 // does not have concurrency - not simultaneously running client and server in the same process
 
-func Runcmd(service *Service) {
-	fmt.Printf("Starting service: %v\n", service.Name)
+func Runcmd(service *Service) error {
 
 	execPath, err := os.Getwd()
 	if err != nil {
 		fmt.Println("Error getting executable path")
-		return
-	}
-
-	if service.Dir == "root" || service.Dir == "" {
-		service.Dir = "/"
+		return err
 	}
 
 	service.Dir = filepath.Join(execPath, service.Dir)
-
 	var cmd *exec.Cmd
-	if runtime.GOOS == "windows" {
-		cmd = exec.Command("cmd", "/C", service.Command)
-	} else {
-		cmd = exec.Command("sh", "-c", service.Command)
+
+	switch runtime.GOOS {
+	case "windows":
+		if service.Type == "server" {
+			cmd = exec.Command("cmd", "/C", "start", "cmd", "/K", service.Command)
+		} else {
+			cmd = exec.Command("cmd", "/C", service.Command)
+		}
+	case "darwin":
+		if service.Type == "server" {
+			cmd = exec.Command("osascript", "-e", fmt.Sprintf(`tell application "Terminal" to do script "cd %s && %s"`, service.Dir, service.Command))
+		} else {
+			cmd = exec.Command("sh", "-c", service.Command)
+		}
+	default: // Linux and others
+		if service.Type == "server" {
+			cmd = exec.Command("gnome-terminal", "--", "sh", "-c", fmt.Sprintf("cd %s && %s", service.Dir, service.Command))
+		} else {
+			cmd = exec.Command("sh", "-c", service.Command)
+		}
 	}
+
 	cmd.Dir = service.Dir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	if err := cmd.Run(); err != nil {
-		fmt.Printf("Error starting service %v\n", service.Name)
-	}
+	fmt.Printf("Starting service: %v\n", service.Name)
 
-	fmt.Println()
+	return cmd.Start()
 
 }
