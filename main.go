@@ -18,10 +18,8 @@ type Config struct {
 	Services []Service `yaml:"services"`
 }
 
-
 func main() {
-
-	fmt.Println("1.2")
+	fmt.Print("Gorun v1.3\n\n")
 
 	configFile := "gorun.yaml"
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {

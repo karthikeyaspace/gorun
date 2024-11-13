@@ -8,8 +8,6 @@ import (
 	"runtime"
 )
 
-// does not have concurrency - not simultaneously running client and server in the same process
-
 func Runcmd(service *Service) error {
 
 	execPath, err := os.Getwd()
@@ -28,12 +26,6 @@ func Runcmd(service *Service) error {
 		} else {
 			cmd = exec.Command("cmd", "/C", service.Command)
 		}
-	case "darwin":
-		if service.Type == "server" {
-			cmd = exec.Command("osascript", "-e", fmt.Sprintf(`tell application "Terminal" to do script "cd %s && %s"`, service.Dir, service.Command))
-		} else {
-			cmd = exec.Command("sh", "-c", service.Command)
-		}
 	default: // Linux and others
 		if service.Type == "server" {
 			cmd = exec.Command("gnome-terminal", "--", "sh", "-c", fmt.Sprintf("cd %s && %s", service.Dir, service.Command))
@@ -45,8 +37,6 @@ func Runcmd(service *Service) error {
 	cmd.Dir = service.Dir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-
-	fmt.Printf("Starting service: %v\n", service.Name)
 
 	return cmd.Start()
 
